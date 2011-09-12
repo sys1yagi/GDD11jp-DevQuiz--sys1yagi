@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 public class PuzzleNxN {
-	private final static char[] CHARS = { '1', '2', '3', '4', '5', '6', '7',
-			'8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-			'Y', 'Z', '0' };
 	int mNo = 0;
 	int mWidth = 0;
 	int mHeight = 0;
@@ -46,14 +42,13 @@ public class PuzzleNxN {
 		mWidth = width;
 		mHeight = height;
 		mPieces = pieces;
-		// mWork = new char[width * height];
 		mGoal = new char[width * height];
 		GOAL: for (int i = 0; i < mGoal.length; i++) {
 			if (pieces[i] == '=') {
 				mGoal[i] = pieces[i];
 			} else {
 				for (int j = 0; j < pieces.length; j++) {
-					if (CHARS[i] == pieces[j]) {
+					if (Piece.CHARS[i] == pieces[j]) {
 						mGoal[i] = pieces[j];
 						continue GOAL;
 					}
@@ -140,39 +135,30 @@ public class PuzzleNxN {
 //		return score;
 //	}
 
-	public static int LIMIT_DEPTH = 1;
-	public static int LIMIT_WIDTH = 10000;
+	//public static int LIMIT_DEPTH = 1;
+	//public static int LIMIT_WIDTH = 10000;
 	public static boolean REVERSE = false;
-
-	public int getLimitDepth() {
-		return LIMIT_DEPTH;
-	}
-
-	public int getMaxCount() {
-		return LIMIT_WIDTH;
-	}
 
 	static class Item {
 		int score;
 		char[] work;
 	}
 
-	public String start() {
-		System.out.println("start:" + toString() + "::" + LIMIT_DEPTH);
+	public String start(int limitDepth, int limitWidth) {
+		System.out.println("start:" + toString() + "::depth" + limitDepth + " width:" + limitWidth);
 
 		Map<String, String> history = new HashMap<String, String>();
 
 		long time = System.currentTimeMillis();
-		int limit_width = getMaxCount();
-		int limit_depth = getLimitDepth();
+
 		List<Node> item = new ArrayList<Node>();
 		List<Node> item2 = new ArrayList<Node>();
 		int zero = mZeroIndex;
 		int score = Node.calcScore(mWidth, mHeight,0, mPieces);//getScore(0, limit_depth, mPieces);
 
 		new Node(null, mPieces, score, zero, "").createNext(mWidth, mHeight,
-				item, limit_depth);
-		for (int d = 0; d < limit_depth; d++) {
+				item, limitDepth);
+		for (int d = 0; d < limitDepth; d++) {
 			for (int i = 0; i < item.size(); i++) {
 				Node n = item.get(i);
 				if (n != null) {
@@ -190,16 +176,16 @@ public class PuzzleNxN {
 				}
 			}
 			Collections.sort(item, COMPARE);
-			int count = Math.min(limit_width, item.size());
+			int count = Math.min(limitWidth, item.size());
 			for (int i = 0; i < count; i++) {
 				Node n = item.get(i);
-				if (n.history.length() < limit_depth) {
+				if (n.history.length() < limitDepth) {
 					// ハッシュ参照
 					// n.createNext(mWidth, mHeight, item2, limit_depth);
 
 					String hash = n.getHash();
 					if (history.get(hash) == null) {
-						n.createNext(mWidth, mHeight, item2, limit_depth);
+						n.createNext(mWidth, mHeight, item2, limitDepth);
 						history.put(hash, "");
 					}
 				}

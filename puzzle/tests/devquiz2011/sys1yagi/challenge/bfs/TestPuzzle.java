@@ -19,7 +19,7 @@ public class TestPuzzle {
 	public void doTestNormal(int no, String line) {
 		long time = System.currentTimeMillis();
 		PuzzleNxN puzzle = PuzzleNxN.createForLine(no, line);
-		String result = puzzle.start();
+		String result = puzzle.start(130, 10000);
 		System.out.println("NORM:" + result + ":"
 				+ (System.currentTimeMillis() - time) + "ms");
 	}

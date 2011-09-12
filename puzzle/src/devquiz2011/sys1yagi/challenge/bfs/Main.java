@@ -8,94 +8,78 @@ import java.util.List;
 import devquiz2011.sys1yagi.challenge.bfs.Results.Result;
 
 public class Main {
-	public static int RE_CALC_BORDER = 150;
-
+	
+	private final static String DUMP = "dump";
 	/**
-	 * 1:"dump"の場合情報だけ出力して終わる
-	 * 2:スレッド数
-	 * 3:探索深度
-	 * 4:探索幅
-	 * 5:再計算を行う手数ボーダー
-	 * 6:リバース
-	 * @param args
+	 * 実行時引数のオプション
+	 * @author tyagi
+	 *
 	 */
-	public static void main(String[] args) {
-		try {
-			if(args.length >= 6){
-				if("reverse".equals(args[5])){
-					System.out.println("reverse mode");
-					PuzzleNxN.REVERSE = true;
+	public static class Options{
+		int threadCount = 1;
+		int limitDepth = 150;
+		int limitWidth = 10000;
+		int reCalcBorder = 150;
+		boolean isSave = true;
+		String command = "run";
+		public static Options create(String[] args){
+			Options o = new Options();
+			for(int i = 0; i < args.length; i++){
+				switch(i){
+				case 0:
+					o.command = args[0];
+					break;
+				case 1:
+					o.threadCount = Integer.parseInt(args[1]);
+					break;
+				case 2:
+					o.limitDepth = Integer.parseInt(args[2]);
+					break;
+				case 3:
+					o.limitWidth = Integer.parseInt(args[3]);
+					break;
+				case 4:
+					o.reCalcBorder = Integer.parseInt(args[4]);
+					break;
+				case 5:
+					if("false".equals(args[5])){
+						o.isSave = false;
+					}
+					break;
 				}
 			}
-			
-			final Quiz quiz = new Quiz();
-			// 問題の読み込み
-			quiz.load("files/challenge.slidepuzzle.txt");
-			// 解答済み結果読み込み
-			quiz.loadResults("files/result.txt");
-
-			quiz.printQuiz();
-
-			if (args.length > 0) {
-				if ("dump".equals(args[0])) {
-					return;
-				}
-			}
-
-			// 計算量が小さい順にソート
-			Collections.sort(quiz.mPuzzles, new Comparator<PuzzleNxN>() {
-				@Override
-				public int compare(PuzzleNxN o1, PuzzleNxN o2) {
-					return (o1.mHeight * o1.mWidth) - (o2.mHeight * o2.mWidth);
-				}
-			});
-			int limitDepth = 1;
-			if (args.length >= 3) {
-				limitDepth = Integer.parseInt(args[2]);
-			}
-			System.out.println("init depth:" + limitDepth);
-			int limitWidth = 10000;
-			if (args.length >= 4) {
-				limitWidth = Integer.parseInt(args[3]);
-			}
-			System.out.println("init width:" + limitWidth);
-
-			if (args.length >= 5) {
-				RE_CALC_BORDER = Integer.parseInt(args[4]);
-			}
-			
-			if(args.length >= 7){
-				if("nosave".equals(args[6])){
-					Results.isSave = false;
-				}
-			}
-			
-			System.out.println("recalc:" + RE_CALC_BORDER);
-			PuzzleNxN.LIMIT_DEPTH = limitDepth;
-			PuzzleNxN.LIMIT_WIDTH = limitWidth;
-			System.out.println("depth:" + limitDepth);
-			start(args, quiz);
-			limitDepth += 10;
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-
+			return o;
 		}
 	}
-
-	public static void start(String[] args, final Quiz quiz) {
+	private Options mOptions = null;
+	public Main(String[] args){
+		mOptions = Options.create(args);
+	}
+	public void start() throws Exception{
+		final Quiz quiz = new Quiz();
+		// 問題の読み込み
+		quiz.load("files/challenge.slidepuzzle.txt");
+		// 解答済み結果読み込み
+		quiz.loadResults("files/result.txt");
+		quiz.printQuiz();
+		if(DUMP.equals(mOptions.command)){
+			return;
+		}
+		// 計算量が小さい順にソート
+		Collections.sort(quiz.mPuzzles, new Comparator<PuzzleNxN>() {
+			@Override
+			public int compare(PuzzleNxN o1, PuzzleNxN o2) {
+				return (o1.mHeight * o1.mWidth) - (o2.mHeight * o2.mWidth);
+			}
+		});
+		run(quiz);
+	}
+	public void run(final Quiz quiz){
 		long time = System.currentTimeMillis();
 		quiz.index = 0;
 		try {
-			int tSize = 1;
-			if (args.length >= 2) {
-				tSize = Integer.parseInt(args[1]);
-			}
-
-			final int reCalcBorder = RE_CALC_BORDER;
-			int THREADS = tSize;
 			List<Thread> threads = new ArrayList<Thread>();
-			for (int i = 0; i < THREADS; i++) {
+			for (int i = 0; i < mOptions.threadCount; i++) {
 				Thread t = new Thread() {
 					@Override
 					public void run() {
@@ -105,8 +89,8 @@ public class Main {
 						while ((p = quiz.getNext()) != null) {
 							// 計算済みの問題はスキップ
 							Result rr = quiz.getResult(p.mNo);
-							if (rr == null || rr.result.length() > reCalcBorder) {
-								result = p.start();
+							if (rr == null || rr.result.length() > mOptions.reCalcBorder) {
+								result = p.start(mOptions.limitDepth, mOptions.limitWidth);
 								if (result != null) {
 									Results.Result r = new Results.Result();
 									r.result = result;
@@ -127,9 +111,25 @@ public class Main {
 			System.out.println(quiz.mResults.mResults.size());
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-
 		}
 		System.out.println("end:" + (System.currentTimeMillis() - time) + "ms");
+	}
+	
+	/**
+	 * 1:"dump"の場合情報だけ出力して終わる
+	 * 2:スレッド数
+	 * 3:探索深度
+	 * 4:探索幅
+	 * 5:再計算を行う手数ボーダー
+	 * 6:保存フラグ
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		try{
+			new Main(args).start();
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("args: command threads limit_depath limit_width [recalc_boarder] [isSave]");
+		}
 	}
 }
