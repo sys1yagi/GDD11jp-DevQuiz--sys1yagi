@@ -16,12 +16,15 @@ public class Main {
 	 *
 	 */
 	public static class Options{
+		String command = "run";
 		int threadCount = 1;
 		int limitDepth = 150;
 		int limitWidth = 10000;
 		int reCalcBorder = 150;
 		boolean isSave = true;
-		String command = "run";
+		
+		//TODO MDを復活させる
+		String scoreMethod = "MD";
 		public static Options create(String[] args){
 			Options o = new Options();
 			for(int i = 0; i < args.length; i++){
@@ -51,20 +54,18 @@ public class Main {
 			return o;
 		}
 	}
-	private Options mOptions = null;
-	public Main(String[] args){
-		mOptions = Options.create(args);
-	}
-	public void start() throws Exception{
+	public void start(String[] args) throws Exception{
+		Options options = Options.create(args);
 		final Quiz quiz = new Quiz();
 		// 問題の読み込み
 		quiz.load("files/challenge.slidepuzzle.txt");
 		// 解答済み結果読み込み
 		quiz.loadResults("files/result.txt");
 		quiz.printQuiz();
-		if(DUMP.equals(mOptions.command)){
+		if(DUMP.equals(options.command)){
 			return;
 		}
+		quiz.setSave(options.isSave);
 		// 計算量が小さい順にソート
 		Collections.sort(quiz.mPuzzles, new Comparator<PuzzleNxN>() {
 			@Override
@@ -72,14 +73,14 @@ public class Main {
 				return (o1.mHeight * o1.mWidth) - (o2.mHeight * o2.mWidth);
 			}
 		});
-		run(quiz);
+		run(quiz, options);
 	}
-	public void run(final Quiz quiz){
+	public void run(final Quiz quiz,final Options options){
 		long time = System.currentTimeMillis();
 		quiz.index = 0;
 		try {
 			List<Thread> threads = new ArrayList<Thread>();
-			for (int i = 0; i < mOptions.threadCount; i++) {
+			for (int i = 0; i < options.threadCount; i++) {
 				Thread t = new Thread() {
 					@Override
 					public void run() {
@@ -89,8 +90,8 @@ public class Main {
 						while ((p = quiz.getNext()) != null) {
 							// 計算済みの問題はスキップ
 							Result rr = quiz.getResult(p.mNo);
-							if (rr == null || rr.result.length() > mOptions.reCalcBorder) {
-								result = p.start(mOptions.limitDepth, mOptions.limitWidth);
+							if (rr == null || rr.result.length() > options.reCalcBorder) {
+								result = p.start(options.limitDepth, options.limitWidth);
 								if (result != null) {
 									Results.Result r = new Results.Result();
 									r.result = result;
@@ -108,7 +109,7 @@ public class Main {
 			for (Thread t : threads) {
 				t.join();
 			}
-			System.out.println(quiz.mResults.mResults.size());
+			System.out.println(quiz.mResults.getResults().size());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -126,7 +127,7 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		try{
-			new Main(args).start();
+			new Main().start(args);
 		}catch(Exception e){
 			e.printStackTrace();
 			System.out.println("args: command threads limit_depath limit_width [recalc_boarder] [isSave]");

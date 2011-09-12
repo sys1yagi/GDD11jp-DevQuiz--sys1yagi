@@ -13,14 +13,27 @@ import java.util.Map;
 import devquiz2011.sys1yagi.challenge.bfs.util.Util;
 
 public class Results {
-	public static boolean isSave = true;
+	
 	public static class Result {
 		int no;
 		String result;
+		public int getNo(){
+			return no;
+		}
+		public String getResult(){
+			return result;
+		}
+	}
+	private Map<Integer, Result> mResults = new HashMap<Integer, Results.Result>();
+	private String file;
+	public boolean isSave = true;
+	public void setSave(boolean isSave){
+		this.isSave = isSave;
+	}
+	public Map<Integer, Result> getResults() {
+		return mResults;
 	}
 
-	Map<Integer, Result> mResults = new HashMap<Integer, Results.Result>();
-	String file;
 	public void add(Result result) {
 		Result r = mResults.get(result.no);
 		if (r == null) {
@@ -28,10 +41,8 @@ public class Results {
 			save();
 		} else {
 			if (r.result.length() <= result.result.length()) {
-				//System.out.println("not replace:"+result.result.length() + "::" + r.result.length());
 				return;
 			} else {
-				//System.out.println("replace:"+result.result);
 				mResults.put(result.no, result);
 				save();
 				return;

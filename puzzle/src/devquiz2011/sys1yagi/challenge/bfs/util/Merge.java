@@ -1,10 +1,11 @@
-package devquiz2011.sys1yagi.challenge.bfs;
+package devquiz2011.sys1yagi.challenge.bfs.util;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+
+import devquiz2011.sys1yagi.challenge.bfs.Results;
 import devquiz2011.sys1yagi.challenge.bfs.Results.Result;
-import devquiz2011.sys1yagi.challenge.bfs.util.Util;
 
 public class Merge {
 	public static void main(String[] args) {
@@ -22,18 +23,18 @@ public class Merge {
 				osw = new OutputStreamWriter(fos);
 				bw = new BufferedWriter(osw);
 				for (int i = 1; i <= 5000; i++) {
-					Result r1 = result1.mResults.get(i);
-					Result r2 = result2.mResults.get(i);
+					Result r1 = result1.getResults().get(i);
+					Result r2 = result2.getResults().get(i);
 					if (r1 != null && r2 != null) {
-						if (r1.result.length() < r2.result.length()) {
-							bw.write(r1.result);
+						if (r1.getResult().length() < r2.getResult().length()) {
+							bw.write(r1.getResult());
 						} else {
-							bw.write(r2.result);
+							bw.write(r2.getResult());
 						}
 					} else if (r1 != null) {
-						bw.write(r1.result);
+						bw.write(r1.getResult());
 					} else if (r2 != null) {
-						bw.write(r2.result);
+						bw.write(r2.getResult());
 					}
 					bw.newLine();
 				}

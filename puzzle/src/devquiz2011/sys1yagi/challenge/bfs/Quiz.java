@@ -71,13 +71,22 @@ public class Quiz {
 	 * @return
 	 */
 	public Result getResult(int no) {
-		return mResults.mResults.get(no);
+		return mResults.getResults().get(no);
 	}
 
 	public void addResult(Result r) {
 		mResults.add(r);
 	}
 
+	public void setSave(boolean isSave){
+		mResults.setSave(isSave);
+	}
+	
+	/**
+	 * 各サイズの問題の正解数、総数、最小手数、最大手数
+	 * 回答数
+	 * 各種手の利用率
+	 */
 	public void printQuiz() {
 		// Status
 		System.out.println(mStatus.toString());
@@ -98,8 +107,8 @@ public class Quiz {
 		int rx = mStatus.rx;
 		int ux = mStatus.ux;
 		int dx = mStatus.dx;
-		for (Integer i : mResults.mResults.keySet()) {
-			Result r = mResults.mResults.get(i);
+		for (Integer i : mResults.getResults().keySet()) {
+			Result r = mResults.getResults().get(i);
 			for(int j = 0; j < r.result.length(); j++){
 				switch(r.result.charAt(j)){
 				case 'L':
@@ -151,13 +160,12 @@ public class Quiz {
 		System.out.println("5x6=" + rC.get(5 * 6) + "/" +qC.get(5 * 6) + " min=" + min.get(5*6) + " max=" + max.get(5*6));
 		System.out.println("6x6=" + rC.get(6 * 6) + "/" +qC.get(6 * 6) + " min=" + min.get(6*6) + " max=" + max.get(6*6));
 
-		System.out.println("points:" + mResults.mResults.size());
+		System.out.println("points:" + mResults.getResults().size());
 		
 		//残り手数
-		
-		System.out.println("L:" + (mStatus.lx-lx) + "/" + mStatus.lx + "=" + lx);
-		System.out.println("R:"+ (mStatus.rx-rx) + "/" + mStatus.rx + "=" + rx);
-		System.out.println("U:"+ (mStatus.ux-ux) + "/" + mStatus.ux + "=" + ux); 
-		System.out.println("D:"+ (mStatus.dx-dx) + "/" + mStatus.dx + "=" + dx);
+		System.out.println("L:" + (mStatus.lx-lx) + "/" + mStatus.lx + "=" + lx + " " + ((mStatus.lx-lx)/mStatus.lx*100) + "%");
+		System.out.println("R:"+ (mStatus.rx-rx) + "/" + mStatus.rx + "=" + rx + " " + ((mStatus.rx-rx)/mStatus.rx*100) + "%");
+		System.out.println("U:"+ (mStatus.ux-ux) + "/" + mStatus.ux + "=" + ux + " " + ((mStatus.ux-ux)/mStatus.ux*100) + "%");
+		System.out.println("D:"+ (mStatus.dx-dx) + "/" + mStatus.dx + "=" + dx + " " + ((mStatus.dx-dx)/mStatus.dx*100) + "%");
 	}
 }
