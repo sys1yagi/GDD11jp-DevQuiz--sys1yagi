@@ -16,10 +16,35 @@ public class PuzzleNxN {
 	char[] mGoal;
 	int mZeroIndex = 0;
 	String mResult = "";
-
-	public PuzzleNxN() {
-
+	
+	public int getNo() {
+		return mNo;
 	}
+
+	public int getWidth() {
+		return mWidth;
+	}
+
+	public int getHeight() {
+		return mHeight;
+	}
+
+	public char[] getPieces() {
+		return mPieces;
+	}
+
+	public String getResult() {
+		return mResult;
+	}
+
+	public char[] getGoal() {
+		return mGoal;
+	}
+
+	public int getZeroIndex() {
+		return mZeroIndex;
+	}
+
 	public static PuzzleNxN createForLine(int no, String line) {
 		String[] items = line.split(",");
 		int w = Integer.parseInt(items[0]);
@@ -86,7 +111,7 @@ public class PuzzleNxN {
 	 * 
 	 * @return
 	 */
-	boolean isSolve(char[] work, char[] goal) {
+	public boolean isSolve(char[] work, char[] goal) {
 		for (int i = 0; i < mWidth * mHeight; i++) {
 			if (work[i] != goal[i]) {
 				return false;

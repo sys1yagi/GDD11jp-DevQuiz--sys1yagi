@@ -1,8 +1,8 @@
-package devquiz2011.sys1yagi.challenge.bfs;
+package devquiz2011.sys1yagi.challenge.bfs.util;
 
+import devquiz2011.sys1yagi.challenge.bfs.PuzzleNxN;
+import devquiz2011.sys1yagi.challenge.bfs.Quiz;
 import devquiz2011.sys1yagi.challenge.bfs.Results.Result;
-import devquiz2011.sys1yagi.challenge.bfs.util.FileWriter;
-import devquiz2011.sys1yagi.challenge.bfs.util.Util;
 
 public class Unanswered {
 
@@ -24,13 +24,13 @@ public class Unanswered {
 
 			PuzzleNxN puzzle = null;
 			while ((puzzle = quiz.getNext()) != null) {
-				Result r = quiz.getResult(puzzle.mNo);
+				Result r = quiz.getResult(puzzle.getNo());
 				if (r == null) {
 					StringBuilder sb = new StringBuilder();
-					for (int i = 0; i < puzzle.mPieces.length; i++) {
-						sb.append(puzzle.mPieces[i]);
+					for (int i = 0; i < puzzle.getPieces().length; i++) {
+						sb.append(puzzle.getPieces()[i]);
 					}
-					fw.write(puzzle.mNo + ":" + puzzle.mWidth + "," + puzzle.mHeight + "," + sb.toString());
+					fw.write(puzzle.getNo() + ":" + puzzle.getWidth() + "," + puzzle.getHeight() + "," + sb.toString());
 					fw.newLine();
 				}
 			}

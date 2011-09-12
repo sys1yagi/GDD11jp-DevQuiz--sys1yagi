@@ -1,5 +1,8 @@
-package devquiz2011.sys1yagi.challenge.bfs;
+package devquiz2011.sys1yagi.challenge.bfs.util;
 
+import devquiz2011.sys1yagi.challenge.bfs.Direction;
+import devquiz2011.sys1yagi.challenge.bfs.PuzzleNxN;
+import devquiz2011.sys1yagi.challenge.bfs.Quiz;
 import devquiz2011.sys1yagi.challenge.bfs.Results.Result;
 
 public class Validator {
@@ -14,23 +17,23 @@ public class Validator {
 
 			PuzzleNxN puzzle = null;
 			while ((puzzle = quiz.getNext()) != null) {
-				Result r = quiz.getResult(puzzle.mNo);
+				Result r = quiz.getResult(puzzle.getNo());
 				
 				if(r != null){
-					char[] work = new char[puzzle.mWidth*puzzle.mHeight];
-					System.arraycopy(puzzle.mPieces, 0, work, 0, puzzle.mPieces.length);
-					int zero = puzzle.mZeroIndex;
-					for(int i = 0; i < r.result.length(); i++){
-						char c = r.result.charAt(i);
+					char[] work = new char[puzzle.getWidth()*puzzle.getHeight()];
+					System.arraycopy(puzzle.getPieces(), 0, work, 0, puzzle.getPieces().length);
+					int zero = puzzle.getZeroIndex();
+					for(int i = 0; i < r.getResult().length(); i++){
+						char c = r.getResult().charAt(i);
 						Direction d = Direction.valueOf(Character.toString(c));
 						try{
-							zero = d.move(puzzle.mWidth, puzzle.mHeight, zero, work);
+							zero = d.move(puzzle.getWidth(), puzzle.getHeight(), zero, work);
 						}catch(RuntimeException e){
 							//System.out.println("NG:" + puzzle.toString());
 							break;
 						}
 					}
-					if(puzzle.isSolve(work, puzzle.mGoal)){
+					if(puzzle.isSolve(work, puzzle.getGoal())){
 						
 					}
 					else{
