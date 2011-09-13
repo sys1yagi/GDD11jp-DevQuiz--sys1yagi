@@ -140,9 +140,9 @@ public class PuzzleNxN {
 	public static boolean REVERSE = false;
 
 	public String start(int limitDepth, int limitWidth, Score scorer) {
-		if(mWidth * mHeight > 9){
-			return null;
-		}
+//		if(mWidth * mHeight > 9){
+//			return null;
+//		}
 		long time = System.currentTimeMillis();
 		System.out.println("start:" + toString() + "::depth" + limitDepth + " width:" + limitWidth);
 		
