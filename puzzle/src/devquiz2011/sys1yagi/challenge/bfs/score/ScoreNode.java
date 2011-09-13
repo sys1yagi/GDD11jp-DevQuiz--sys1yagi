@@ -1,6 +1,8 @@
-package devquiz2011.sys1yagi.challenge.bfs;
+package devquiz2011.sys1yagi.challenge.bfs.score;
 
 import java.util.List;
+
+import devquiz2011.sys1yagi.challenge.bfs.Direction;
 
 /**
  * 壁を考慮したスコア計算を行う為のクラス
@@ -10,7 +12,7 @@ import java.util.List;
  */
 public class ScoreNode {
 	Direction direction;
-	int distance;
+	public int distance;
 	int zeroIndex;
 	char[] work;
 

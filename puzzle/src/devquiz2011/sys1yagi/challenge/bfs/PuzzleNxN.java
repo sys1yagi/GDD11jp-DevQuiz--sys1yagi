@@ -7,12 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import devquiz2011.sys1yagi.challenge.bfs.score.Score;
+
 public class PuzzleNxN {
 	int mNo = 0;
 	int mWidth = 0;
 	int mHeight = 0;
 	char[] mPieces;
-	// char[] mWork;
 	char[] mGoal;
 	int mZeroIndex = 0;
 	String mResult = "";
@@ -62,7 +63,7 @@ public class PuzzleNxN {
 		return p;
 	}
 
-	public void set(int no, int width, int height, char[] pieces) {
+	private void set(int no, int width, int height, char[] pieces) {
 		mNo = no;
 		mWidth = width;
 		mHeight = height;
@@ -136,50 +137,20 @@ public class PuzzleNxN {
 			+ "]";
 	}
 
-	/**
-	 * 盤面のスコアを計算し、継続可能かを見きわめる
-	 * 
-	 * @return
-	 */
-	public boolean isContinue(int depth, int lDepth, char[] work) {
-		return Node.calcScore(mWidth, mHeight, depth,  work) <= lDepth;
-	}
-
-//	public int getScore(int depth, int lDepth, char[] work) {
-//		int score = depth;
-//		for (int i = 0; i < work.length; i++) {
-//			int goal = Piece.getGoalPos(work[i]);
-//			int x = goal % mWidth;
-//			int y = goal / mHeight;
-//			int ix = i % mWidth;
-//			int iy = i / mHeight;
-//			score += Math.abs(x - ix);
-//			score += Math.abs(y - iy);
-//		}
-//		// System.out.print(score+"::");
-//		return score;
-//	}
-
-	//public static int LIMIT_DEPTH = 1;
-	//public static int LIMIT_WIDTH = 10000;
 	public static boolean REVERSE = false;
 
-	static class Item {
-		int score;
-		char[] work;
-	}
-
-	public String start(int limitDepth, int limitWidth) {
-		System.out.println("start:" + toString() + "::depth" + limitDepth + " width:" + limitWidth);
-
-		Map<String, String> history = new HashMap<String, String>();
-
+	public String start(int limitDepth, int limitWidth, Score scorer) {
+		if(mWidth * mHeight > 9){
+			return null;
+		}
 		long time = System.currentTimeMillis();
-
-		List<Node> item = new ArrayList<Node>();
-		List<Node> item2 = new ArrayList<Node>();
+		System.out.println("start:" + toString() + "::depth" + limitDepth + " width:" + limitWidth);
+		
+		Map<String, String> history = new HashMap<String, String>();
+		List<Node> item = new ArrayList<Node>(limitWidth*4);
+		List<Node> item2 = new ArrayList<Node>(limitWidth*4);
 		int zero = mZeroIndex;
-		int score = Node.calcScore(mWidth, mHeight,0, mPieces);//getScore(0, limit_depth, mPieces);
+		int score = scorer.calc(mWidth, mHeight, 0, mPieces); 
 
 		new Node(null, mPieces, score, zero, "").createNext(mWidth, mHeight,
 				item, limitDepth);
@@ -187,7 +158,7 @@ public class PuzzleNxN {
 			for (int i = 0; i < item.size(); i++) {
 				Node n = item.get(i);
 				if (n != null) {
-					n.perform(mWidth, mHeight, d);
+					n.perform(mWidth, mHeight, d, scorer);
 					if (isSolve(n.work, mGoal)) {
 						mResult = n.history;
 						if (REVERSE) {

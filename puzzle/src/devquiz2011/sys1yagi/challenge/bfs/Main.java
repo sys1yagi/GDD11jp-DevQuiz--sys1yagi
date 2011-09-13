@@ -6,6 +6,9 @@ import java.util.Comparator;
 import java.util.List;
 
 import devquiz2011.sys1yagi.challenge.bfs.Results.Result;
+import devquiz2011.sys1yagi.challenge.bfs.score.MD;
+import devquiz2011.sys1yagi.challenge.bfs.score.SH;
+import devquiz2011.sys1yagi.challenge.bfs.score.Score;
 
 public class Main {
 	
@@ -16,15 +19,35 @@ public class Main {
 	 *
 	 */
 	public static class Options{
+		private Options(){}
+		/** dumpの時スコア情報だけ出力して終わる。他の場合は普通に走る */
 		String command = "run";
+		/** スレッド数 */
 		int threadCount = 1;
+		/** 探索する上限深度 */
 		int limitDepth = 150;
+		/** キューの最大サイズ */
 		int limitWidth = 10000;
+		/** 再計算を行う手数。0なら全部再計算する。 */
 		int reCalcBorder = 150;
+		/** 結果を保存するかどうか */
 		boolean isSave = true;
+	
+		/** 評価関数の種類 MD=マンハッタン距離,SH=最短距離 */
+		Score scoreMethod = new MD();
 		
-		//TODO MDを復活させる
-		String scoreMethod = "MD";
+		/** 幅優先、双方向 */ 
+		String searchMethod = "";
+		
+		@Override
+		public String toString() {
+			return "Options [command=" + command + ", threadCount="
+					+ threadCount + ", limitDepth=" + limitDepth
+					+ ", limitWidth=" + limitWidth + ", reCalcBorder="
+					+ reCalcBorder + ", isSave=" + isSave + ", scoreMethod="
+					+ scoreMethod + ", searchMethod=" + searchMethod + "]";
+		}
+
 		public static Options create(String[] args){
 			Options o = new Options();
 			for(int i = 0; i < args.length; i++){
@@ -49,6 +72,12 @@ public class Main {
 						o.isSave = false;
 					}
 					break;
+				case 6:
+					if("SH".equals(args[6])){
+						o.scoreMethod = new SH();
+					}
+
+					break;
 				}
 			}
 			return o;
@@ -56,6 +85,7 @@ public class Main {
 	}
 	public void start(String[] args) throws Exception{
 		Options options = Options.create(args);
+		System.out.println(options.toString());
 		final Quiz quiz = new Quiz();
 		// 問題の読み込み
 		quiz.load("files/challenge.slidepuzzle.txt");
@@ -91,7 +121,7 @@ public class Main {
 							// 計算済みの問題はスキップ
 							Result rr = quiz.getResult(p.mNo);
 							if (rr == null || rr.result.length() > options.reCalcBorder) {
-								result = p.start(options.limitDepth, options.limitWidth);
+								result = p.start(options.limitDepth, options.limitWidth, options.scoreMethod);
 								if (result != null) {
 									Results.Result r = new Results.Result();
 									r.result = result;
@@ -123,6 +153,8 @@ public class Main {
 	 * 4:探索幅
 	 * 5:再計算を行う手数ボーダー
 	 * 6:保存フラグ
+	 * 7:評価関数
+	 * 8:探索方法
 	 * @param args
 	 */
 	public static void main(String[] args) {
